@@ -6,27 +6,35 @@ fn main() {
     println!("Guess the number!");
 
     let secret_number = rand::thread_rng().gen_range(1..101);
+    let mut number_of_guesses: u32 = 0;
 
-    println!("The secret number is: {}", secret_number);
+    loop {
+        number_of_guesses = number_of_guesses + 1;
+        println!("Please input your guess.");
 
-    println!("Please input your guess.");
+        let mut guess = String::new();
 
-    let mut guess = String::new();
+        io::stdin()
+            // Returns Result with type Ok or Err:
+            // - Ok holds result data, in this case - number of bytes of user's input;
+            // - Err holds stacktrace error information.
+            .read_line(&mut guess)
+            .expect("Failed to read line!");
 
-    io::stdin()
-        // Returns Result with type Ok or Err:
-        // - Ok holds result data, in this case - number of bytes of user's input;
-        // - Err holds stacktrace error information.
-        .read_line(&mut guess)
-        .expect("Failed to read line!");
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
 
-    let guess: u32 = guess.trim().parse().expect("Please type a number!");
+        println!("You guessed: {}", guess);
 
-    println!("You guessed: {}", guess);
-
-    match guess.cmp(&secret_number) {
-        Ordering::Less => println!("Too small!"),
-        Ordering::Greater => println!("Too big!"),
-        Ordering::Equal => println!("You win!"),
+        match guess.cmp(&secret_number) {
+            Ordering::Less => println!("Too small!"),
+            Ordering::Greater => println!("Too big!"),
+            Ordering::Equal => {
+                println!("You win! It took you {} guesses.", number_of_guesses);
+                break;
+            }
+        }
     }
 }
